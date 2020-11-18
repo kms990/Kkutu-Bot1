@@ -26543,7 +26543,7 @@ setInterval(function Main() {
     //체인수 가져오기 isRoundEnd
     setTimeout(() => {
         var Chain = document.getElementsByClassName("chain")[0].textContent;
-        if (Chain == 0&&CanResetHistoryWords) {
+        if (Chain == 0 && CanResetHistoryWords) {
             overlapwords = []; //사용한단어 초기화
             CanResetHistoryWords = false;
             InputWrongWord = false;
@@ -26553,7 +26553,7 @@ setInterval(function Main() {
     //gethistoryword
     setTimeout(() => {
         var expl = document.getElementsByClassName("ellipse history-item expl-mother");
-        if(expl[0].innerHTML&&expl[0].innerHTML.includes("<")) {
+        if(expl[0].innerHTML && expl[0].innerHTML.includes("<")) {
             var v = expl[0].innerHTML.split("<")[0];
             if(!overlapwords.includes(v)) overlapwords.push(v);
         }
@@ -26573,12 +26573,10 @@ function GetStartWord() {
     if(isTwoSoundWord) {
         var FirstKeyword = get_firstWord.substring(0, 1);
         var SecondKeyword = get_firstWord.substring(2, 3);
-        WordList = words.filter(x => x.startsWith(FirstKeyword)&&!overlapwords.includes(x) || x.startsWith(SecondKeyword)&&!overlapwords.includes(x));
-    } else {
-        WordList = words.filter(x => x.startsWith(get_firstWord)&&!overlapwords.includes(x));
-    }
+        WordList = words.filter(x => x[0] == FirstKeyword && !overlapwords.includes(x) || x[0] == SecondKeyword && !overlapwords.includes(x));
+    } else WordList = words.filter(x => x.startsWith(get_firstWord)&&!overlapwords.includes(x));
     WordList.sort((a, b) => b.length - a.length);
-    WordList.sort((a, b) => (b.split(Mission).length) - (a.split(Mission).length));
+    WordList.sort((a, b) => b.split(Mission).length - a.split(Mission).length);
 
     if (WordList[0]) {
         SendWord(WordList[0]);
@@ -26631,7 +26629,7 @@ function ChatSetBlank() {
 setInterval(function CheckInputWrongWord() {
     FailText = document.getElementsByClassName("game-fail-text")[0].innerHTML;
     var _isMytrn = document.getElementsByClassName("game-input")[0].style.display; //isMyTurn
-    if(FailText&& _isMytrn == 'block' && isOnMacro && isRightmode && !FailText.includes("..T.T")) {
+    if(FailText&& _isMytrn == 'block' && isOnMacro && isRightmode && !FailText.includes("T.T")) {
         if(FailText.startsWith("이미 쓰인 단어") || FailText.startsWith("한방 단어")) FailText = FailText.split(":")[1].trim();
         InputWrongWord = true;
         if(!FailList.includes(FailText)) FailList.push(FailText);
