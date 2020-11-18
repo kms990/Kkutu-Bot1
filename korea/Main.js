@@ -26525,36 +26525,44 @@ var isRightmode = false;
 var delay = 110;
 var FailList = [];
 setInterval(function Main() {
-    var get_isMyturn = document.getElementsByClassName("game-input")[0].style.display; //값 가져오기
-    var Mode = document.getElementsByClassName("room-head-mode")[0].innerHTML;
-    isRightmode = (Mode.startsWith("한국어 끝말잇기") || Mode.startsWith("영어 끝말잇기")) ? true : false;
-    if (get_isMyturn == "block" &&isNextMyturn&&isOnMacro&&isRightmode) { //block = isMyturn, isNextMyturn = 내턴일때 재실행 방지
-        GetStartWord();
-        isNextMyturn = false;
-        InputWrongWord = false;
-    } else { //none = NotMyturn
-        isNextMyturn = true;
-        FailText = null;
-    }
-    var Chain = document.getElementsByClassName("chain")[0].textContent; //체인수 가져오기 isRoundEnd
-    if (Chain == 0&&CanResetHistoryWords) {
-        overlapwords = []; //사용한단어 초기화
-        CanResetHistoryWords = false;
-        InputWrongWord = false;
-        FailText = null;
-    } else if (Chain > 0) {
-        CanResetHistoryWords = true;
-    }
-    var expl = document.getElementsByClassName("ellipse history-item expl-mother"); //gethistoryword
-    if(expl[0].innerHTML&&expl[0].innerHTML.includes("<")) {
-        var v = expl[0].innerHTML.split("<")[0];
-        if(!overlapwords.includes(v)) overlapwords.push(v);
-    }
+    
+    setTimeout(() => {
+        var get_isMyturn = document.getElementsByClassName("game-input")[0].style.display; //값 가져오기
+        var Mode = document.getElementsByClassName("room-head-mode")[0].innerHTML;
+        isRightmode = (Mode.startsWith("한국어 끝말잇기") || Mode.startsWith("영어 끝말잇기")) ? true : false;
+        if (get_isMyturn == "block" && isNextMyturn && isOnMacro && isRightmode) { //block = isMyturn, isNextMyturn = 내턴일때 재실행 방지
+            GetStartWord();
+            isNextMyturn = false;
+            InputWrongWord = false;
+        } else { //none = NotMyturn
+            isNextMyturn = true;
+            FailText = null;
+        }
+    }, 0)
+
+    //체인수 가져오기 isRoundEnd
+    setTimeout(() => {
+        var Chain = document.getElementsByClassName("chain")[0].textContent;
+        if (Chain == 0&&CanResetHistoryWords) {
+            overlapwords = []; //사용한단어 초기화
+            CanResetHistoryWords = false;
+            InputWrongWord = false;
+            FailText = null;
+        } else if (Chain > 0) CanResetHistoryWords = true;
+    }, 0)
+    //gethistoryword
+    setTimeout(() => {
+        var expl = document.getElementsByClassName("ellipse history-item expl-mother");
+        if(expl[0].innerHTML&&expl[0].innerHTML.includes("<")) {
+            var v = expl[0].innerHTML.split("<")[0];
+            if(!overlapwords.includes(v)) overlapwords.push(v);
+        }
+    }, 0)
 }, delay);
 
 function GetStartWord() {
     var get_firstWord = document.getElementsByClassName("jjo-display ellipse")[0].innerHTML; //시작단어
-    if(FailText != null && InputWrongWord) {
+    if(FailText && InputWrongWord) {
         get_firstWord = FailText[0];
         FailText = null;
         InputWrongWord = false;
@@ -26572,9 +26580,9 @@ function GetStartWord() {
     WordList.sort((a, b) => b.length - a.length);
     WordList.sort((a, b) => (b.split(Mission).length) - (a.split(Mission).length));
 
-    if (WordList[0] != null) {
+    if (WordList[0]) {
         SendWord(WordList[0]);
-    } else if(!WordList[0]){ SendWord(get_firstWord + "..T.T"); }
+    } else if(!WordList[0]) SendWord(get_firstWord + "..T.T");
 }
 
 function SendWord(idx) {
@@ -26584,33 +26592,35 @@ function SendWord(idx) {
 }
 
 setInterval(function CheckInputBox() {
-    var Box = document.querySelectorAll("[maxlength=\"" + MaxLength + "\"]")[1].value;
-    var cmd = ["/a", "/s", "/d", "/f", "/g", "/h"];
-    if(cmd.includes(Box)) {
-        var cmd1 = cmd.indexOf(Box);
-        if(cmd1 != -1) {
-            if(cmd1 == 0) {
-                isOnMacro = true;
-                ChatSetBlank();
-            } else if(cmd1 == 1) {
-                isOnMacro = false;
-                ChatSetBlank();
-            } else if(cmd1 == 2) {
-                GetStartWord();
-                ChatSetBlank();
-            } else if(cmd1 == 3) {
-                for(var t = 0; t < 10; t++){
-                    document.querySelector("#obtain-ok").click();
-                }
-                ChatSetBlank();
-            } else if(cmd1 == 4) {
-                alert(JSON.stringify(FailList));
-                ChatSetBlank();
-            } else if(cmd1 == 5) {
-                FailList = [];
-                ChatSetBlank();
+    var InputWord = document.querySelectorAll("[maxlength=\"" + MaxLength + "\"]")[1].value;
+    switch(InputWord) {
+        case "/a":
+            isOnMacro = true;
+            ChatSetBlank();
+            break;
+        case "/s":
+            isOnMacro = false;
+            ChatSetBlank();
+            break;
+        case "/d":
+            GetStartWord();
+            ChatSetBlank();
+            break;
+        case "/f":
+            for(var t = 0; t < 10; t++){
+                document.querySelector("#obtain-ok").click();
             }
-        }
+            ChatSetBlank();
+            break;
+        case "/g":
+            alert(JSON.stringify(FailList));
+            ChatSetBlank();
+            break;
+        case "/h":
+            FailList = [];
+            ChatSetBlank();
+            break;
+            default:
     }
 }, 1000)
 
@@ -26620,8 +26630,8 @@ function ChatSetBlank() {
 
 setInterval(function CheckInputWrongWord() {
     FailText = document.getElementsByClassName("game-fail-text")[0].innerHTML;
-    var isMT1 = document.getElementsByClassName("game-input")[0].style.display; //isMyTurn
-    if(FailText != null && isMT1 == 'block' && isOnMacro && isRightmode && !FailText.includes("..T.T")) {
+    var _isMytrn = document.getElementsByClassName("game-input")[0].style.display; //isMyTurn
+    if(FailText&& _isMytrn == 'block' && isOnMacro && isRightmode && !FailText.includes("..T.T")) {
         if(FailText.startsWith("이미 쓰인 단어") || FailText.startsWith("한방 단어")) FailText = FailText.split(":")[1].trim();
         InputWrongWord = true;
         if(!FailList.includes(FailText)) FailList.push(FailText);
