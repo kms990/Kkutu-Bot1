@@ -26524,6 +26524,7 @@ var isOnMacro = true;
 var isRightmode = false;
 var delay = 110;
 var FailList = [];
+alert("v1.1.0 최적화 및 버그픽스")
 setInterval(function Main() {
     
     setTimeout(() => {
